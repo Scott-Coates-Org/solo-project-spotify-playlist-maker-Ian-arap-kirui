@@ -26,11 +26,10 @@
     "preinstall": "node ./preinstall.js",
     "postinstall": "node ./postinstall.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "devDependencies": {
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1"
   },
   "browserslist": {
     "production": [

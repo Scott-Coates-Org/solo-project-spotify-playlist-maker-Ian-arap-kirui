@@ -1,0 +1,7 @@
+.header {
+  margin: 1em;
+}
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+}

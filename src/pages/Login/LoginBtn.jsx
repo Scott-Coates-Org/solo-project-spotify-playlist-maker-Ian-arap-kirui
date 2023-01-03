@@ -1,12 +1,15 @@
-import { SpotifyAuth, Scopes } from 'react-spotify-auth';
-import 'react-spotify-auth/dist/index.css'; // if using the included styles
-import styles from './login.module.css';
+import { SpotifyAuth, Scopes } from "react-spotify-auth";
+import "react-spotify-auth/dist/index.css"; // if using the included styles
+import styles from "./login.module.css";
 
-import React from 'react';
-import { useAuth } from './Auth';
+import React from "react";
+import { useAuth } from "../../components/auth/Auth";
 
 const spotifyClientKey = process.env.REACT_APP_SPOTIFY_CLIENT_KEY;
-if (!spotifyClientKey) throw new Error(`spotify client key missing. Did you read the issues? If not, visit the Issues page in this repo on GitHub.`);
+if (!spotifyClientKey)
+  throw new Error(
+    `spotify client key missing. Did you read the issues? If not, visit the Issues page in this repo on GitHub.`
+  );
 
 const Login = () => {
   let retVal;
@@ -16,12 +19,12 @@ const Login = () => {
   const loginHandler = (token) => {
     setToken(token);
     // SpotifyAuth looks at the token in the url fragment, so we must remove it because the logout method will not work until we remove this.
-    window.location = '/';
+    window.location = "/";
   };
 
   const logoutHandler = () => {
     setToken(null);
-    window.location = '/';
+    window.location = "/";
   };
 
   if (token) {
@@ -37,7 +40,12 @@ const Login = () => {
           noCookie={true}
           redirectUri="http://localhost:3000/callback"
           clientID={spotifyClientKey}
-          scopes={[Scopes.playlistModifyPrivate, Scopes.playlistModifyPublic, Scopes.playlistReadPrivate, Scopes.playlistReadCollaborative]}
+          scopes={[
+            Scopes.playlistModifyPrivate,
+            Scopes.playlistModifyPublic,
+            Scopes.playlistReadPrivate,
+            Scopes.playlistReadCollaborative,
+          ]}
           onAccessToken={loginHandler}
         />
       </div>

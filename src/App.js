@@ -1,23 +1,13 @@
-
-import Login from './components/login/Login'
-import logo from './logo.svg'
-import './App.css'
-import { AuthProvider } from './components/login/Auth'
+import "./App.css";
+import { AuthProvider } from "./components/auth/Auth";
+import Home from "./pages/home/Home";
 
 function App() {
   return (
     <AuthProvider>
-    <div className='App'>
-      <header className='App-header'>
-        <img src={logo} className='App-logo' alt='logo' />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <Login/>
-      </header>
-    </div>
+      <Home />
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
