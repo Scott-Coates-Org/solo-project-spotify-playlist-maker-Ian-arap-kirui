@@ -6,7 +6,15 @@ export default function Header() {
     <div className={styles.header}>
       <div className={styles.headerContainer}>
         <span className={styles.logo}>TheCoolMusicCo</span>
-        {token ? <span className={styles.icon}>x</span> : <span></span>}
+        {token ? (
+          <img
+            src="https://images.pexels.com/photos/34534/people-peoples-homeless-male.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+            alt="profile-img"
+            className={styles.profilePhoto}
+          />
+        ) : (
+          <span></span>
+        )}
       </div>
     </div>
   );
