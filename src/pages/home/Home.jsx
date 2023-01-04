@@ -15,6 +15,7 @@ export default function Home() {
           <hr className={styles.lineSeparator} />
           <div className={styles.homeContainer}>
             <Index />
+            <LoginBtn />
           </div>
           <hr className={styles.lineSeparator} />
         </>
