@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useState } from "react";
 import styles from "./dropdown.module.css";
 export default function Dropdown() {
