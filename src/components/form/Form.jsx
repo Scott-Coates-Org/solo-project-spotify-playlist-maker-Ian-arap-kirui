@@ -1,8 +1,22 @@
 import { useState } from "react";
-import styles from "./dropdown.module.css";
+import styles from "./form.module.css";
 export default function Dropdown() {
   const [genre, setGenre] = useState("");
   const [year, setYear] = useState("");
+
+  const years = [];
+  const currentYear = new Date().getFullYear();
+  const genres = [
+    { value: "Afrobeats", label: "Afrobeats" },
+    { value: "R&B", label: "R&B" },
+    { value: "rock", label: "Rock-n-Roll" },
+    { value: "Hip-hop", label: "Hip-hop" },
+    { value: "country", label: "Country" },
+  ];
+
+  for (let i = 0; i < 101; i++) {
+    years.push({ value: currentYear - i, label: currentYear - i });
+  }
 
   //validate inputs are filled
   const validate = () => {
@@ -16,27 +30,25 @@ export default function Dropdown() {
           <div className={styles.selector}>
             Genre:{" "}
             <select value={genre} onChange={(e) => setGenre(e.target.value)}>
-              <option value="AfroBeats">AfroBeats</option>
-              <option value="Rap">Rap</option>
-              <option value="Hip-Hop">Hip-Hop</option>
-              <option value="R&B">R&B</option>
-              <option value="Rock">Rock</option>
+              {genres.map((item) => {
+                return (
+                  <>
+                    <option value={item.value}>{item.label}</option>;
+                  </>
+                );
+              })}
             </select>
           </div>
           <div className={styles.selector}>
             Year:{" "}
             <select value={year} onChange={(e) => setYear(e.target.value)}>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
-              <option value="2018">2018</option>
-              <option value="2017">2017</option>
-              <option value="2016">2016</option>
-              <option value="2015">2015</option>
-              <option value="2014">2014</option>
-              <option value="2013">2013</option>
+              {years.map((item) => {
+                return (
+                  <>
+                    <option value={item.value}>{item.label}</option>;
+                  </>
+                );
+              })}
             </select>
           </div>
           <button
