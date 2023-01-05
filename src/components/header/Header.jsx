@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetcher } from "../../utils/api";
+import { getUserData } from "../../utils/api";
 import { useAuth } from "../auth/Auth";
 import styles from "./header.module.css";
 export default function Header() {
@@ -7,19 +7,8 @@ export default function Header() {
   const { token, user } = useAuth();
 
   useEffect(() => {
-    const getUser = async () => {
-      const userResponse = await fetcher("https://api.spotify.com/v1/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        method: "GET",
-      });
-      return userResponse;
-    };
     if (token) {
-      getUser().then((user) => {
-        console.log(user);
+      getUserData(token).then((user) => {
         setUserData(user.images[0].url);
       });
     }
