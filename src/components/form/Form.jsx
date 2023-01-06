@@ -17,7 +17,22 @@ const genres = [
 for (let i = 0; i < 101; i++) {
   years.push({ value: currentYear - i, label: currentYear - i });
 }
-const fillPlaylist = async (token, playlistId) => {};
+const fillPlaylist = async (token, playlistId, tracks) => {
+  const res = await fetcher(
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uris: tracks,
+      }),
+    }
+  );
+  return res;
+};
 const getTracks = async (token, genre, year) => {
   const searchResults = await fetcher(
     `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=30`,
@@ -35,7 +50,7 @@ const selectTracksToAdd = (trackInfoArray) => {
   let totalDuration = 0;
   let tracksToAdd = [];
   for (let i = 0; i < trackInfoArray.length; i++) {
-    if (totalDuration + trackInfoArray[i].duration_seconds < 1800) {
+    if (totalDuration + trackInfoArray[i].duration_seconds <= 3600) {
       tracksToAdd.push(trackInfoArray[i].uri);
       totalDuration += trackInfoArray[i].duration_seconds;
     } else {
@@ -44,20 +59,21 @@ const selectTracksToAdd = (trackInfoArray) => {
   }
   return tracksToAdd;
 };
-export default function Dropdown() {
+export default function Form({ progress, setProgress, message, setMessage }) {
   const { token } = useAuth();
   const genreRef = useRef();
   const yearRef = useRef();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setProgress((prev) => prev + 10);
     if (genreRef.current.hasValue() && yearRef.current.hasValue()) {
       let selectedGenre = genreRef.current.getValue()[0].value;
       let selectedYear = yearRef.current.getValue()[0].value;
-      console.log("genre/year:", selectedGenre, selectedYear);
 
       const userData = await getUserData(token);
+
+      setProgress((prev) => prev + 10);
       const { href } = userData;
       const emptyPlaylist = await fetcher(`${href}/playlists`, {
         method: "POST",
@@ -71,20 +87,29 @@ export default function Dropdown() {
           public: false,
         }),
       });
-      console.log(emptyPlaylist);
+      const playlistId = emptyPlaylist.id;
+      setProgress((prev) => prev + 20);
       const tracksResponse = await getTracks(
         token,
         selectedGenre,
         selectedYear
       );
+      setMessage((message) => message + "songs found...");
+      setProgress((prev) => prev + 10);
       const trackInfo = tracksResponse.tracks.items.map((track) => {
         return {
           uri: track.uri,
           duration_seconds: Math.floor(track.duration_ms / 1000),
         };
       });
+      setProgress((prev) => prev + 20);
       const tracksToAdd = selectTracksToAdd(trackInfo);
-      console.log("tracks to add:", tracksToAdd);
+      setMessage((message) => message + `${tracksToAdd.length} songs added...`);
+      fillPlaylist(token, playlistId, tracksToAdd);
+      setProgress(100);
+      // setTimeout(() => {
+      //   setProgress(0);
+      // }, 9000);
     } else {
       alert("Please select a genre and year");
     }
@@ -99,20 +124,18 @@ export default function Dropdown() {
               options={genres}
               placeholder="Select Genre..."
               className={styles.select}
+              isDisabled={progress > 0}
               ref={genreRef}
             />
             <ReactSelect
               options={years}
               placeholder="Select Year..."
               className={styles.select}
+              isDisabled={progress > 0}
               ref={yearRef}
             />
           </div>
-          <button
-            type="submit"
-            // disabled={}
-            className={styles.generateBtn}
-          >
+          <button type="submit" className={styles.generateBtn}>
             Generate Playlist
           </button>
         </form>
