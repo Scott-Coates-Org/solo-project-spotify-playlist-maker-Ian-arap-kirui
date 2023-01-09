@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import ReactSelect from "react-select";
 import { fetcher, getUserData } from "../../utils/api";
 import { useAuth } from "../auth/Auth";
@@ -6,18 +6,20 @@ import styles from "./form.module.css";
 
 const years = [];
 const currentYear = new Date().getFullYear();
-const genres = [
+const staticGenres = [
   { value: "Afrobeats", label: "Afrobeats" },
   { value: "R&B", label: "R&B" },
   { value: "rock", label: "Rock-n-Roll" },
   { value: "Hip-hop", label: "Hip-hop" },
   { value: "country", label: "Country" },
   { value: "gengetone", label: "Gengetone" },
+  { value: "rhumba", label: "Rhumba" },
 ];
 
 for (let i = 0; i < 101; i++) {
   years.push({ value: currentYear - i, label: currentYear - i });
 }
+
 const fillPlaylist = async (token, playlistId, tracks) => {
   const res = await fetcher(
     `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
@@ -36,7 +38,7 @@ const fillPlaylist = async (token, playlistId, tracks) => {
 };
 const getTracks = async (token, genre, year) => {
   const searchResults = await fetcher(
-    `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=30`,
+    `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=50`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -51,7 +53,7 @@ const selectTracksToAdd = (trackInfoArray) => {
   let totalDuration = 0;
   let tracksToAdd = [];
   for (let i = 0; i < trackInfoArray.length; i++) {
-    if (totalDuration + trackInfoArray[i].duration_seconds <= 3600) {
+    if (totalDuration + trackInfoArray[i].duration_seconds <= 12000) {
       tracksToAdd.push(trackInfoArray[i].uri);
       totalDuration += trackInfoArray[i].duration_seconds;
     } else {
@@ -61,9 +63,31 @@ const selectTracksToAdd = (trackInfoArray) => {
   return tracksToAdd;
 };
 export default function Form({ progress, setProgress, message, setMessage }) {
+  const [genres, setGenres] = useState([]);
+
   const { token } = useAuth();
   const genreRef = useRef();
   const yearRef = useRef();
+
+  useEffect(() => {
+    async function fetchGenres() {
+      const response = await fetch(
+        "https://api.spotify.com/v1/recommendations/available-genre-seeds",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          method: "GET",
+        }
+      );
+
+      const data = await response.json();
+      setGenres(data.genres);
+    }
+
+    fetchGenres();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,7 +146,7 @@ export default function Form({ progress, setProgress, message, setMessage }) {
         <form onSubmit={handleSubmit}>
           <div className={styles.selector}>
             <ReactSelect
-              options={genres}
+              options={genres.map((genre) => ({ value: genre, label: genre }))}
               placeholder="Select Genre..."
               className={styles.select}
               isDisabled={progress > 0}
