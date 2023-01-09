@@ -12,6 +12,7 @@ const genres = [
   { value: "rock", label: "Rock-n-Roll" },
   { value: "Hip-hop", label: "Hip-hop" },
   { value: "country", label: "Country" },
+  { value: "gengetone", label: "Gengetone" },
 ];
 
 for (let i = 0; i < 101; i++) {

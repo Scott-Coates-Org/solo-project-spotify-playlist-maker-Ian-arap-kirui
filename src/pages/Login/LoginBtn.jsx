@@ -38,7 +38,7 @@ const Login = () => {
       <div className={styles.container}>
         <SpotifyAuth
           noCookie={true}
-          redirectUri="http://localhost:3000/callback"
+          redirectUri="https://spotify-playlist-maker-4e821.web.app/callback"
           clientID={spotifyClientKey}
           scopes={[
             Scopes.playlistModifyPrivate,
