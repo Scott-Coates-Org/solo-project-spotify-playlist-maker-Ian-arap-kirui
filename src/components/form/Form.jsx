@@ -6,47 +6,53 @@ import styles from "./form.module.css";
 
 const years = [];
 const currentYear = new Date().getFullYear();
-const staticGenres = [
-  { value: "Afrobeats", label: "Afrobeats" },
-  { value: "R&B", label: "R&B" },
-  { value: "rock", label: "Rock-n-Roll" },
-  { value: "Hip-hop", label: "Hip-hop" },
-  { value: "country", label: "Country" },
-  { value: "gengetone", label: "Gengetone" },
-  { value: "rhumba", label: "Rhumba" },
-];
 
 for (let i = 0; i < 101; i++) {
   years.push({ value: currentYear - i, label: currentYear - i });
 }
 
 const fillPlaylist = async (token, playlistId, tracks) => {
-  const res = await fetcher(
-    `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        uris: tracks,
-      }),
+  try {
+    const res = await fetcher(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uris: tracks,
+        }),
+      }
+    );
+    if (res.ok) {
+      return res;
+    } else {
+      throw new Error(res.statusText);
     }
-  );
-  return res;
+  } catch (err) {
+    console.log(err);
+  }
 };
 const getTracks = async (token, genre, year) => {
-  const searchResults = await fetcher(
-    `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=50`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  try {
+    const searchResults = await fetcher(
+      `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=50`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (searchResults.ok) {
+      return searchResults;
+    } else {
+      throw new Error(searchResults.statusText);
     }
-  );
-  console.log("search results:", searchResults);
-  return searchResults;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const selectTracksToAdd = (trackInfoArray) => {
@@ -64,26 +70,33 @@ const selectTracksToAdd = (trackInfoArray) => {
 };
 export default function Form({ progress, setProgress, message, setMessage }) {
   const [genres, setGenres] = useState([]);
-
+  const [error, setError] = useState(null);
   const { token } = useAuth();
   const genreRef = useRef();
   const yearRef = useRef();
 
   useEffect(() => {
     async function fetchGenres() {
-      const response = await fetch(
-        "https://api.spotify.com/v1/recommendations/available-genre-seeds",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          method: "GET",
+      try {
+        const response = await fetch(
+          "https://api.spotify.com/v1/recommendations/available-genre-seeds",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            method: "GET",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setGenres(data.genres);
+        } else {
+          throw new Error(response.statusText);
         }
-      );
-
-      const data = await response.json();
-      setGenres(data.genres);
+      } catch (err) {
+        setError(err.message);
+      }
     }
 
     fetchGenres();
@@ -132,9 +145,9 @@ export default function Form({ progress, setProgress, message, setMessage }) {
       setMessage((message) => message + `${tracksToAdd.length} songs added...`);
       fillPlaylist(token, playlistId, tracksToAdd);
       setProgress(100);
-      // setTimeout(() => {
-      //   setProgress(0);
-      // }, 9000);
+      setTimeout(() => {
+        setProgress(0);
+      }, 15000);
     } else {
       alert("Please select a genre and year");
     }
@@ -142,29 +155,38 @@ export default function Form({ progress, setProgress, message, setMessage }) {
 
   return (
     <>
-      <div className={styles.pickerContainer}>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.selector}>
-            <ReactSelect
-              options={genres.map((genre) => ({ value: genre, label: genre }))}
-              placeholder="Select Genre..."
-              className={styles.select}
-              isDisabled={progress > 0}
-              ref={genreRef}
-            />
-            <ReactSelect
-              options={years}
-              placeholder="Select Year..."
-              className={styles.select}
-              isDisabled={progress > 0}
-              ref={yearRef}
-            />
-          </div>
-          <button type="submit" className={styles.generateBtn}>
-            Generate Playlist
-          </button>
-        </form>
-      </div>
+      {error ? (
+        <>
+          <p>an error occured</p>
+        </>
+      ) : (
+        <div className={styles.pickerContainer}>
+          <form onSubmit={handleSubmit}>
+            <div className={styles.selector}>
+              <ReactSelect
+                options={genres.map((genre) => ({
+                  value: genre,
+                  label: genre,
+                }))}
+                placeholder="Select Genre..."
+                className={styles.select}
+                isDisabled={progress > 0}
+                ref={genreRef}
+              />
+              <ReactSelect
+                options={years}
+                placeholder="Select Year..."
+                className={styles.select}
+                isDisabled={progress > 0}
+                ref={yearRef}
+              />
+            </div>
+            <button type="submit" className={styles.generateBtn}>
+              Generate Playlist
+            </button>
+          </form>
+        </div>
+      )}
     </>
   );
 }
