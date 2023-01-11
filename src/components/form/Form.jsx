@@ -12,47 +12,32 @@ for (let i = 0; i < 101; i++) {
 }
 
 const fillPlaylist = async (token, playlistId, tracks) => {
-  try {
-    const res = await fetcher(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          uris: tracks,
-        }),
-      }
-    );
-    if (res.ok) {
-      return res;
-    } else {
-      throw new Error(res.statusText);
+  const res = await fetcher(
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uris: tracks,
+      }),
     }
-  } catch (err) {
-    console.log(err);
-  }
+  );
+  return res;
 };
 const getTracks = async (token, genre, year) => {
-  try {
-    const searchResults = await fetcher(
-      `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=50`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    if (searchResults.ok) {
-      return searchResults;
-    } else {
-      throw new Error(searchResults.statusText);
+  const searchResults = await fetcher(
+    `https://api.spotify.com/v1/search?q=genre:${genre}%20year:${year}&type=track&limit=50`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  } catch (err) {
-    console.log(err);
-  }
+  );
+  console.log("search results:", searchResults);
+  return searchResults;
 };
 
 const selectTracksToAdd = (trackInfoArray) => {
