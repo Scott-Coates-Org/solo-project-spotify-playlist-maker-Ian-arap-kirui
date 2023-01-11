@@ -81,15 +81,15 @@ export default function Form({ progress, setProgress, message, setMessage }) {
             "bongo",
             "taarab",
             "lingala",
-            "kenyan gospel",
-            "urban hits",
-            "kenyan hip-hop",
+            "urban-hits",
             "Soukous",
             "kenyan folk",
             "benga",
           ];
 
-          setGenres([...data.genres, ...customGenres]);
+          setGenres(
+            [...data.genres, ...customGenres].sort((a, b) => a.localeCompare(b))
+          );
         } else {
           throw new Error(response.statusText);
         }
