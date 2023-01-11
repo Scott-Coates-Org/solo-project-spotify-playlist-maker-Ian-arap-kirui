@@ -161,7 +161,7 @@ export default function Form({ progress, setProgress, message, setMessage }) {
             />
           </div>
           <button type="submit" className={styles.generateBtn}>
-            Generate Pla
+            Generate Playlist
           </button>
         </form>
       </div>
