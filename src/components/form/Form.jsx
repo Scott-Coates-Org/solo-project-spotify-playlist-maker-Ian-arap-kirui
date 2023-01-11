@@ -36,7 +36,6 @@ const getTracks = async (token, genre, year) => {
       },
     }
   );
-  console.log("search results:", searchResults);
   return searchResults;
 };
 
@@ -75,7 +74,22 @@ export default function Form({ progress, setProgress, message, setMessage }) {
         );
         if (response.ok) {
           const data = await response.json();
-          setGenres(data.genres);
+
+          const customGenres = [
+            "gengetone",
+            "afropop",
+            "bongo",
+            "taarab",
+            "lingala",
+            "kenyan gospel",
+            "urban hits",
+            "kenyan hip-hop",
+            "Soukous",
+            "kenyan folk",
+            "benga",
+          ];
+
+          setGenres([...data.genres, ...customGenres]);
         } else {
           throw new Error(response.statusText);
         }
